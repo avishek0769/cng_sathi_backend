@@ -278,7 +278,7 @@ console.log("Mostly initially-->", mostlyProbableData,"\n");
 
     // Find the most probable CNG status based on relevancy
     let relevantCngStat = Object.entries(cngStatusData).reduce((a, b) => b[1] > a[1] ? b : a);
-    if (relevantCngStat[1] >= 25) {
+    if (relevantCngStat[1] >= 25 || relevantCngStat[2] >= 25 || relevantCngStat[3] >= 25 ) {
         mostlyProbableData["cng_available"] = Number(relevantCngStat[0]);
         
         if(queue != "nil"){
