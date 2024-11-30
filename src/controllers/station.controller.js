@@ -6,7 +6,7 @@ import { ApiError } from "../utils/ApiError.js"
 import mongoose from "mongoose";
 import Redis from "ioredis";
 
-const client = new Redis()
+export const client = new Redis()
 
 const addStationsToDB = asyncHandler(async (req, res) => {
     const { index } = req.query;

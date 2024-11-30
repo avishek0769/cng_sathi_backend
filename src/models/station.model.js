@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose"
 import { app } from "../app.js";
+import { client } from "../controllers/station.controller.js";
 
 const activeCountdowns = new Map();
 
@@ -13,7 +14,7 @@ async function startCountdown(stationId) {
 
     const countdownTimeoutId = setTimeout(async () => {
         try {
-            await Station.findByIdAndUpdate(stationId, {
+            const station = await Station.findByIdAndUpdate(stationId, {
                 cng_available: 0,
                 cng_amount: 0,
                 cng_arrival_time: "nil",
@@ -22,6 +23,13 @@ async function startCountdown(stationId) {
                 userResponsible: null,
                 updatedAt: 0,
             });
+            const placeId = station.place_id;
+            await client.set(`cngStatusRelevancy:${placeId}`, JSON.stringify({"1": 0, "2": 0, "3": 0}));
+            await client.set(`queueRelevancy:${placeId}`, JSON.stringify([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]));
+            await client.set(`pressureRelevancy:${placeId}`, JSON.stringify({"1": 0, "2": 0, "3": 0}));
+            await client.set(`quantityRelevancy:${placeId}`, JSON.stringify({"600": 0, "1200": 0}));
+            await client.set(`arrivalTimeRelevancy:${placeId}`, JSON.stringify({}));
+
             // TODO: Trigger Web Socket event
             app.locals.io.emit("stationStatusUpdated", {_id: stationId, cng_available: 0, queue: "nil"})
             console.log(`Fields reset to default for station ID: ${stationId}`);
@@ -32,7 +40,7 @@ async function startCountdown(stationId) {
         finally {
             activeCountdowns.delete(stationKey); // Remove from Map when done
         }
-    }, 5 * 60 * 60 * 1000);
+    }, 60 * 1000);
     activeCountdowns.set(stationKey, countdownTimeoutId);
 }
 
