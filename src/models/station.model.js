@@ -29,6 +29,13 @@ async function startCountdown(stationId) {
             await client.set(`pressureRelevancy:${placeId}`, JSON.stringify({"1": 0, "2": 0, "3": 0}));
             await client.set(`quantityRelevancy:${placeId}`, JSON.stringify({"600": 0, "1200": 0}));
             await client.set(`arrivalTimeRelevancy:${placeId}`, JSON.stringify({}));
+            await client.set(`lastUpdatedData:${placeId}`, JSON.stringify({
+                "cng_available": 0,
+                "queue": "nil",
+                "pressure": 0,
+                "cng_amount": 0,
+                "cng_arrival_time": "nil"
+            }))
 
             // TODO: Trigger Web Socket event
             app.locals.io.emit("stationStatusUpdated", {_id: stationId, cng_available: 0, queue: "nil"})
